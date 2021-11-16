@@ -6,8 +6,12 @@ import requestResult.AllPersonRequest;
 import requestResult.AllPersonResult;
 import requestResult.LoginRequest;
 import requestResult.LoginResult;
+import requestResult.PersonRequest;
+import requestResult.PersonResult;
 import requestResult.RegisterRequest;
 import requestResult.RegisterResult;
+import requestResult.Result;
+
 import com.google.gson.Gson;
 
 import java.io.IOException;
@@ -22,10 +26,14 @@ import java.net.URL;
 public class ServerProxy {
 
     private static Gson myGson = new Gson();
+    private static String serverHost;
+    private static String serverPort;
 
-    LoginResult login (LoginRequest request) {
+    LoginResult login (LoginRequest request, String serverHost, String serverPort) {
         try {
-            URL url = new URL("http://localhost:8080/user/login");
+            this.serverHost = serverHost;
+            this.serverPort = serverPort;
+            URL url = new URL("http://" + serverHost + ":" + serverPort + "/user/login");
             HttpURLConnection http = (HttpURLConnection)url.openConnection();
 
             http.setRequestMethod("POST");
@@ -38,7 +46,7 @@ public class ServerProxy {
 
             String reqData =
                     "{" +
-                        "\"username\": \"" + request.getUsername() + "\"" +
+                        "\"username\": \"" + request.getUsername() + "\"," +
                         "\"password\": \"" + request.getPassword() + "\"" +
                     '}';
 
@@ -64,15 +72,15 @@ public class ServerProxy {
             }
         } catch (IOException e) {
             e.printStackTrace();
+            return new LoginResult(false, e.toString());
         }
-        return null;
     }
 
 
 
-    RegisterResult register(RegisterRequest request) {
+    RegisterResult register(RegisterRequest request, String serverHost, String serverPort) {
         try {
-            URL url = new URL("http://localhost:8080/user/register");
+            URL url = new URL("http://" + serverHost + ":" + serverPort + "/user/register");
             HttpURLConnection http = (HttpURLConnection)url.openConnection();
 
             http.setRequestMethod("POST");
@@ -85,12 +93,13 @@ public class ServerProxy {
 
             String reqData =
                     "{" +
-                        "\"username\": \"" + request.getUsername() + "\"" +
-                        "\"password\": \"" + request.getPassword() + "\"" +
-                        "\"email\": \"" + request.getEmail() + "\"" +
-                        "\"firstName\": \"" + request.getFirstName() + "\"" +
-                        "\"lastName\": \"" + request.getLastName() + "\"" +
-                        "\"gender\": \"" + request.getGender() + "\"" +
+                        "\"username\": \"" + request.getUsername() + "\"," +
+                        "\"password\": \"" + request.getPassword() + "\"," +
+                        "\"email\": \"" + request.getEmail() + "\"," +
+                        "\"firstName\": \"" + request.getFirstName() + "\"," +
+                        "\"lastName\": \"" + request.getLastName() + "\"," +
+                        "\"gender\": \"" + request.getGender() + "\"," +
+                        "\"personID\": \"" + null + "\"" +
                     '}';
 
             OutputStream reqBody = http.getOutputStream();
@@ -115,17 +124,81 @@ public class ServerProxy {
             }
         } catch (IOException e) {
             e.printStackTrace();
+            return new RegisterResult("Failed to register because username is taken.", false);
         }
-        return null;
     }
-    AllPersonResult getPeople(AllPersonRequest request) {
-        return null;
+    AllPersonResult getPeople(AllPersonRequest request, String authToken) {
+        try {
+            URL url = new URL("http://" + serverHost + ":" + serverPort + "/person");
+            HttpURLConnection http = (HttpURLConnection)url.openConnection();
+
+            http.setRequestMethod("GET");
+
+            http.setDoOutput(false);
+
+            http.addRequestProperty("Authorization", authToken);
+
+            http.addRequestProperty("Accept", "application/json");
+
+            http.connect();
+
+            if(http.getResponseCode() == HttpURLConnection.HTTP_OK) {
+                InputStream respBody = http.getInputStream();
+                String respData = readString(respBody);
+                AllPersonResult result = myGson.fromJson(respData, AllPersonResult.class);
+                System.out.println(respData);
+                return result;
+            }
+            else {
+                InputStream respBody = http.getInputStream();
+                String respData = readString(respBody);
+                AllPersonResult result = myGson.fromJson(respData, AllPersonResult.class);
+                System.out.println(respData);
+                return result;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return new AllPersonResult(false, e.toString());
+        }
     }
     AllEventResult getEvents(AllEventRequest request) {
         return null;
     }
 
+    PersonResult getPerson(PersonRequest request, String authToken) {
+        try {
+            URL url = new URL("http://" + serverHost + ":" + serverPort + "/person/" + request.getPersonID());
+            HttpURLConnection http = (HttpURLConnection)url.openConnection();
 
+            http.setRequestMethod("GET");
+
+            http.setDoOutput(false);
+
+            http.addRequestProperty("Authorization", authToken);
+
+            http.addRequestProperty("Accept", "application/json");
+
+            http.connect();
+
+            if(http.getResponseCode() == HttpURLConnection.HTTP_OK) {
+                InputStream respBody = http.getInputStream();
+                String respData = readString(respBody);
+                PersonResult result = myGson.fromJson(respData, PersonResult.class);
+                System.out.println(respData);
+                return result;
+            }
+            else {
+                InputStream respBody = http.getInputStream();
+                String respData = readString(respBody);
+                PersonResult result = myGson.fromJson(respData, PersonResult.class);
+                System.out.println(respData);
+                return result;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return new PersonResult(e.toString(), false);
+        }
+    }
 
     /*
 		The readString method shows how to read a String from an InputStream.

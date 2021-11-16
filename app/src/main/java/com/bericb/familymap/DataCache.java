@@ -19,12 +19,41 @@ public class DataCache {
     private DataCache() {
     }
 
+    public Settings getSettings() {
+        return settings;
+    }
 
+    public void setSettings(Settings settings) {
+        this.settings = settings;
+    }
 
+    public Map<String, Person> getPeople() {
+        return people;
+    }
 
-//    Cached Data
+    public void setPeople(Map<String, Person> people) {
+        this.people = people;
+    }
+
+    public Map<String, Event> getEvents() {
+        return events;
+    }
+
+    public void setEvents(Map<String, Event> events) {
+        this.events = events;
+    }
+
+    public Map<String, List<Event>> getPersonEvents() {
+        return personEvents;
+    }
+
+    public void setPersonEvents(Map<String, List<Event>> personEvents) {
+        this.personEvents = personEvents;
+    }
+
+    //    Cached Data
 //      Settings
-    Settings settings;
+    private Settings settings;
 
 
 //    Models
@@ -33,7 +62,9 @@ public class DataCache {
     private Map<String, List<Event>> personEvents;
 
 //    Cached data access methods
-    Person getPersonByID(String id) { return null; }
+    Person getPersonByID(String id) {
+        return people.get(id);
+    }
     Event getEventByID(String id) { return null; }
     List<Event> getPersonEvents(String id) {return null;}
 
