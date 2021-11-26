@@ -25,6 +25,7 @@
                 android:layout_height="wrap_content"
                 android:layout_span="2"
                 android:inputType="text"
+                android:text="10.0.2.2"
                 tools:text="192.168.1.1" />
         </TableRow>
 
@@ -42,6 +43,7 @@
                 android:layout_height="wrap_content"
                 android:layout_span="2"
                 android:inputType="number"
+                android:text="8080"
                 tools:text="8080" />
         </TableRow>
 
@@ -59,6 +61,7 @@
                 android:layout_height="wrap_content"
                 android:layout_span="2"
                 android:inputType="textNoSuggestions"
+                android:text="bericb"
                 tools:text="bericb" />
 
         </TableRow>
@@ -77,6 +80,7 @@
                 android:layout_height="wrap_content"
                 android:layout_span="2"
                 android:inputType="textPassword"
+                android:text="passy"
                 tools:text="yeahyeah" />
 
         </TableRow>
