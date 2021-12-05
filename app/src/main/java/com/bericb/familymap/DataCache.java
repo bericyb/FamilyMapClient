@@ -65,10 +65,14 @@ public class DataCache {
     Person getPersonByID(String id) {
         return people.get(id);
     }
-    Event getEventByID(String id) { return null; }
+    Event getEventByID(String id) { return events.get(id); }
     List<Event> getPersonEvents(String id) {return null;}
 
 
+    public void clear() {
+        instance = null;
+        instance = new DataCache();
+    }
 
 
 }

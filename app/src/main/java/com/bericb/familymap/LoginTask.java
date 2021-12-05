@@ -13,6 +13,7 @@ import requestResult.PersonResult;
 public class LoginTask implements Runnable{
 
     private static final String LOGIN_RESULT_STRING = "LoginResult";
+    private static final String LOGIN_SUCCESS = "success";
     private final Handler messageHandler;
     private LoginRequest request;
     private String serverHost;
@@ -46,21 +47,22 @@ public class LoginTask implements Runnable{
         LoginResult res = myProxy.login(request, serverHost, serverPort);
 
         if(!res.getSuccess()) {
-            sendMessage("Username and/or Password incorrect");
+            sendMessage("Username and/or Password incorrect", "false");
         } else {
             Settings.getInstance().setUsername(res.getUsername());
             Settings.getInstance().setAuthToken(res.getAuthToken());
             DataCache.getInstance().setSettings(Settings.getInstance());
             DataGrabTask dataGrabber = new DataGrabTask(messageHandler, res);
-            sendMessage(dataGrabber.grabData());
+            sendMessage(dataGrabber.grabData(), "true");
         }
 
     }
 
-    private void sendMessage(String result) {
+    private void sendMessage(String result, String success) {
         Message message = Message.obtain();
         Bundle messageBundle = new Bundle();
         messageBundle.putString(LOGIN_RESULT_STRING, result);
+        messageBundle.putString(LOGIN_SUCCESS, success);
         message.setData(messageBundle);
 
         messageHandler.sendMessage(message);

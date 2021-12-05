@@ -1,9 +1,12 @@
 package com.bericb.familymap;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.os.Handler;
 import android.os.Message;
@@ -33,6 +36,8 @@ public class LoginFragment extends Fragment {
 
     private static final String LOGIN_RESULT_STRING = "LoginResult";
     private static final String REGISTER_RESULT_STRING = "RegisterResult";
+
+    private static final String LOGIN_SUCCESS = "success";
 
     private EditText serverHost;
     private EditText serverPort;
@@ -80,6 +85,15 @@ public class LoginFragment extends Fragment {
         email = view.findViewById(R.id.emailField);
         gender = view.findViewById(R.id.genderButtons);
 
+        if (userName.getText().toString().length() != 0
+                && password.getText().toString().length() != 0
+                && serverPort.getText().toString().length() != 0
+                && serverHost.getText().toString().length() != 0) {
+            signIn.setEnabled(true);
+        } else {
+            signIn.setEnabled(false);
+        }
+
 
         signIn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -96,6 +110,17 @@ public class LoginFragment extends Fragment {
 
                         //Toast displaying login result.
                         Toast.makeText(getActivity(), loginToast, Toast.LENGTH_SHORT).show();
+
+                        //If the process was a success, then switch fragments after displaying toast.
+                        //If the process was a success, then switch fragments after displaying toast.
+                        if (bundle.getString(LOGIN_SUCCESS, "false") == "true") {
+                            Fragment mapFrag = new MapFragment();
+                            //Maybe getSupportFragmentManager()?
+                            FragmentManager fm = getActivity().getSupportFragmentManager();
+                            FragmentTransaction transaction = fm.beginTransaction();
+                            transaction.replace(R.id.fragment_container, mapFrag, "MAP_FRAG");
+                            transaction.commit();
+                        }
                     }
                 };
 
@@ -128,6 +153,16 @@ public class LoginFragment extends Fragment {
 
                         //Toast displaying registration result
                         Toast.makeText(getActivity(), registerToast, Toast.LENGTH_SHORT).show();
+
+                        //If the process was a success, then switch fragments after displaying toast.
+                        if (registerToast != "Registration failed...") {
+                            Fragment mapFrag = new MapFragment();
+                            //Maybe getSupportFragmentManager()?
+                            FragmentManager fm = getActivity().getSupportFragmentManager();
+                            FragmentTransaction transaction = fm.beginTransaction();
+                            transaction.replace(R.id.fragment_container, mapFrag, "MAP_FRAG");
+                            transaction.commit();
+                        }
                     }
                 };
 

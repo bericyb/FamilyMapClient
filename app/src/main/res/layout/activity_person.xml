@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".PersonActivity">
+
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/firstName" />
+
+        <TextView
+            android:id='@+id/personFirstName'
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:label='@string/firstName'
+            android:padding="24px"
+            android:text="lorem"
+            android:textSize="34sp" />
+
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="3px"
+            android:background="@color/black" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/lastName" />
+
+        <TextView
+            android:id='@+id/personLastName'
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:label='@string/lastName'
+            android:padding="24px"
+            android:text="lorem"
+            android:textSize="34sp" />
+
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="3px"
+            android:background="@color/black" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/gender" />
+
+        <TextView
+            android:id='@+id/personGender'
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:label='@string/gender'
+            android:padding="24px"
+            android:text="lorem"
+            android:textSize="34sp" />
+
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="3px"
+            android:background="@color/black" />
+
+        <ExpandableListView
+            android:id="@+id/expandablePerson"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:indicatorEnd="?android:attr/expandableListPreferredChildIndicatorLeft"
+            android:layout_marginLeft="8dp"/>
+    </LinearLayout>
+
+
+</RelativeLayout>

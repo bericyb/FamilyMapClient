@@ -161,8 +161,39 @@ public class ServerProxy {
             return new AllPersonResult(false, e.toString());
         }
     }
-    AllEventResult getEvents(AllEventRequest request) {
-        return null;
+    AllEventResult getEvents(AllEventRequest request, String authToken) {
+        try {
+            URL url = new URL("http://" + serverHost + ":" + serverPort + "/event");
+            HttpURLConnection http = (HttpURLConnection)url.openConnection();
+
+            http.setRequestMethod("GET");
+
+            http.setDoOutput(false);
+
+            http.addRequestProperty("Authorization", authToken);
+
+            http.addRequestProperty("Accept", "application/json");
+
+            http.connect();
+
+            if(http.getResponseCode() == HttpURLConnection.HTTP_OK) {
+                InputStream respBody = http.getInputStream();
+                String respData = readString(respBody);
+                AllEventResult result = myGson.fromJson(respData, AllEventResult.class);
+                System.out.println(respData);
+                return result;
+            }
+            else {
+                InputStream respBody = http.getInputStream();
+                String respData = readString(respBody);
+                AllEventResult result = myGson.fromJson(respData, AllEventResult.class);
+                System.out.println(respData);
+                return result;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return new AllEventResult(false, e.toString());
+        }
     }
 
     PersonResult getPerson(PersonRequest request, String authToken) {

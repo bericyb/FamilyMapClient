@@ -12,7 +12,34 @@
     <string name="female">Female</string>
     <string name="signIn">Sign In</string>
     <string name="register">Register</string>
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="personIntent">PERSON</string>
+    <string name="eventIntent">EVENT</string>
+    <string name="mapFragmentMessage">Click on a marker to see event details</string>
+    <string name="personActivity">Family Map: Person Details</string>
+    <string name="srch">search</string>
+    <string name="searchActivity">Family Map: Search</string>
+    <string name="settingsActivity">Family Map: Settings</string>
+    <string name="lifeEvents">Life Events:</string>
+    <string name="family">"Family: "</string>
+    <string name="father">Father</string>
+    <string name="mother">Mother</string>
+    <string name="spouse">Spouse</string>
+    <string name="child">Child</string>
+    <string name="LifeStoryLines">Life Story Lines</string>
+    <string name="familyTreeLines">Family Tree Lines</string>
+    <string name="spouseLines">Spouse Lines</string>
+    <string name="fatherSide">Father\'s Side</string>
+    <string name="motherSide">Mother\'s Side</string>
+    <string name="maleEvents">Male Events</string>
+    <string name="femaleEvents">Female Events</string>
+    <string name="logout">Logout and return to login screen</string>
+    <string name="LifeStorydesc">Show life story lines</string>
+    <string name="femaleDisc">Filter events based on gender</string>
+    <string name="maleDisc">Filter events by gender</string>
+    <string name="motherDisc">Filer by mother\'s side of family</string>
+    <string name="fatherDisc">Filter by father\'s side of family</string>
+    <string name="spouseDisc">Show spouse lines</string>
+    <string name="familyTreeDisc">Show family tree lines</string>
 
 </resources>
