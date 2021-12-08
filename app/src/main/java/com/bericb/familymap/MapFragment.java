@@ -1,18 +1,27 @@
 package com.bericb.familymap;
 
+import static android.graphics.Color.BLUE;
+import static android.graphics.Color.GREEN;
+import static android.graphics.Color.MAGENTA;
+import static android.graphics.Color.blue;
+
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 
 import android.os.Parcelable;
+import android.service.autofill.Dataset;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,8 +33,14 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 
+import java.security.Policy;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import model.Event;
@@ -37,14 +52,49 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
     private Event currEvent;
     private TextView eventSum;
+    private List<Polyline> lines = new ArrayList<Polyline>();
+    private Map<String, Event> events;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater layoutInflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(layoutInflater, container, savedInstanceState);
         View view = layoutInflater.inflate(R.layout.fragment_maps, container, false);
 
-        setHasOptionsMenu(true);
+        if (getArguments() != null) {
 
+            String isEventActivity = getArguments().getString("EVENT", null);
+            if (isEventActivity != null) {
+                currEvent = DataCache.getInstance().getEventByID(isEventActivity);
+                eventSum = view.findViewById(R.id.mapTextView);
+
+                DataCache data = DataCache.getInstance();
+                Person person = data.getPersonByID(currEvent.getPersonID());
+
+                String gender = person.getGender();
+
+                switch (gender) {
+                    case "m" : eventSum.setCompoundDrawablesWithIntrinsicBounds(
+                            R.drawable.male, 0,0,0);
+                        break;
+                    case "f" :
+                        eventSum.setCompoundDrawablesWithIntrinsicBounds(
+                                R.drawable.female, 0, 0, 0);
+                        break;
+                }
+
+                String name = person.getFirstName() + " " + person.getLastName();
+
+                String type = currEvent.getEventType();
+
+                String city = currEvent.getCity();
+
+                String year = Integer.toString(currEvent.getYear());
+                String country = currEvent.getCountry();
+
+                eventSum.setText(name + '\n' + type + " : " + city + ", " + country + " (" + year + ")");
+
+            }
+        }
 
 
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
@@ -57,8 +107,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
             public void onClick(View v) {
                 if (currEvent == null) {
                     Toast.makeText(getActivity(), "Please pick an event.", Toast.LENGTH_SHORT).show();
-                }
-                else {
+                } else {
                     System.out.println("HELLO!" + currEvent.getEventID());
                     Intent intent = new Intent(getActivity(), PersonActivity.class);
                     intent.putExtra("PERSON", currEvent.getPersonID());
@@ -71,35 +120,25 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     }
 
     @Override
-    public void onCreateOptionsMenu (@NonNull Menu menu, @NonNull MenuInflater inflater){
-        inflater.inflate(R.menu.main_menu, menu);
-    }
+    public void onResume() {
 
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch(item.getItemId()) {
-            case R.id.action_search: {
-                Intent intent = new Intent(getActivity(), SearchActivity.class);
-                startActivity(intent);
-                return true;
-            }
-            case R.id.action_settings: {
-                Intent intent = new Intent(getActivity(), SettingsActivity.class);
-                startActivity(intent);
-                return true;
-            }
+        super.onResume();
+        if (events != DataCache.getInstance().getEvents() && map != null) {
+            map.clear();
+            onMapReady(map);
         }
-        return true;
     }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
         map = googleMap;
         map.setOnMapLoadedCallback(this);
+        if (currEvent != null) {
+            map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(currEvent.getLatitude(), currEvent.getLongitude()), 10.0f));
+        }
 
         DataCache data = DataCache.getInstance();
-        Map<String, Event> events = data.getEvents();
+        events = data.getEvents();
         float googleColor = BitmapDescriptorFactory.HUE_RED;
         for (Object entry : events.values()) {
             Event event = (Event) entry;
@@ -125,8 +164,17 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
                     .title(event.getEventType()));
             marker.setTag(event);
             map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                @RequiresApi(api = Build.VERSION_CODES.N)
                 @Override
                 public boolean onMarkerClick(Marker marker) {
+
+                    //Remove previous lines after click.
+                    for (Polyline line :
+                            lines) {
+                        line.remove();
+                    }
+                    lines.clear();
+
                     map.animateCamera(CameraUpdateFactory.newLatLng(marker.getPosition()));
                     Event clickedEvent = (Event) marker.getTag();
                     DataCache data = DataCache.getInstance();
@@ -135,10 +183,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
                     String gender = person.getGender();
 
                     switch (gender) {
-                        case "m" : eventSum.setCompoundDrawablesWithIntrinsicBounds(
-                                R.drawable.male, 0,0,0);
-                        break;
-                        case "f" :
+                        case "m":
+                            eventSum.setCompoundDrawablesWithIntrinsicBounds(
+                                    R.drawable.male, 0, 0, 0);
+                            break;
+                        case "f":
                             eventSum.setCompoundDrawablesWithIntrinsicBounds(
                                     R.drawable.female, 0, 0, 0);
                             break;
@@ -155,11 +204,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
                     currEvent = clickedEvent;
                     eventSum.setText(name + '\n' + type + " : " + city + ", " + country + " (" + year + ")");
+
+                    drawLines(currEvent, person, marker);
+
                     return false;
                 }
             });
         }
-   }
+    }
 
     @Override
     public void onMapLoaded() {
@@ -168,5 +220,53 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         // onMapReady(...) because the map isn't really all the way ready. If you see that, just
         // move all code where you interact with the map (everything after
         // map.setOnMapLoadedCallback(...) above) to here.
+    }
+
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private void drawLines(Event currEvent, Person person, Marker marker) {
+
+        //Spouse Lines
+        if (DataCache.getInstance().getSettings().isSpouseLines()) {
+            List<LatLng> locations = FilterHelper.drawSpouseLines(person);
+            for (Object entry :
+                    locations) {
+                LatLng loc = (LatLng) entry;
+                Polyline spouseLine = map.addPolyline(new PolylineOptions()
+                        .clickable(false)
+                        .add(
+                                marker.getPosition(),
+                                loc));
+                lines.add(spouseLine);
+            }
+        }
+
+        //Family tree lines
+        if (DataCache.getInstance().getSettings().isFamilyTree()) {
+            List<LatLngData> points = FilterHelper.familyTreeHelper(person.getFatherID(), person.getMotherID(), marker.getPosition());
+            for (Object entry :
+                    points) {
+                LatLngData data = (LatLngData) entry;
+                Polyline familyLine = map.addPolyline(new PolylineOptions().clickable(false)
+                .width(10 - data.getLevel()).color(BLUE).add(data.getCurrLoc(), data.getLatLng()));
+                lines.add(familyLine);
+            }
+        }
+
+        //LifeStory Lines
+        if (DataCache.getInstance().getSettings().isLifeStory()) {
+            List<LatLng> locations = FilterHelper.drawLifeStory(person.getPersonID());
+            for (Object entry :
+                    locations) {
+                LatLng loc = (LatLng) entry;
+                Polyline spouseLine = map.addPolyline(new PolylineOptions()
+                        .clickable(false)
+                        .color(GREEN)
+                        .add(
+                                marker.getPosition(),
+                                loc));
+                lines.add(spouseLine);
+            }
+        }
     }
 }

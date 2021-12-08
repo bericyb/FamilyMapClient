@@ -51,6 +51,7 @@ public class LoginTask implements Runnable{
         } else {
             Settings.getInstance().setUsername(res.getUsername());
             Settings.getInstance().setAuthToken(res.getAuthToken());
+            Settings.getInstance().setPersonID(res.getPersonID());
             DataCache.getInstance().setSettings(Settings.getInstance());
             DataGrabTask dataGrabber = new DataGrabTask(messageHandler, res);
             sendMessage(dataGrabber.grabData(), "true");

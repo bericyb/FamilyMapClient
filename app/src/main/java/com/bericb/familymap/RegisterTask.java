@@ -33,6 +33,10 @@ public class RegisterTask implements Runnable {
         if(!res.getSuccess()) {
             sendMessage(res.getMessage());
         } else {
+            Settings.getInstance().setUsername(res.getUsername());
+            Settings.getInstance().setAuthToken(res.getAuthToken());
+            Settings.getInstance().setPersonID(res.getId());
+            DataCache.getInstance().setSettings(Settings.getInstance());
             LoginRequest req = new LoginRequest(res.getUsername(), this.req.getPassword());
             LoginTask loginTask = new LoginTask(messageHandler, req, serverHost, serverPort);
             sendMessage(loginTask.login());

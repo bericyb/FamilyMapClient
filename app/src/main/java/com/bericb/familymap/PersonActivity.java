@@ -260,7 +260,7 @@ public class PersonActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View v) {
                     Intent intent = new Intent(PersonActivity.this, EventActivity.class);
-                    intent.putExtra(String.valueOf(R.string.eventIntent), event.getEventID());
+                    intent.putExtra("EVENT", event.getEventID());
                     startActivity(intent);
                 }
             });
@@ -298,7 +298,7 @@ public class PersonActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View v) {
                     Intent intent = new Intent(PersonActivity.this, PersonActivity.class);
-                    intent.putExtra(String.valueOf("PERSON"), person.getPersonID());
+                    intent.putExtra("PERSON", person.getPersonID());
                     startActivity(intent);
                 }
             });

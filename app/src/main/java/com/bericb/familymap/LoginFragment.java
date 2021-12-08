@@ -2,8 +2,10 @@ package com.bericb.familymap;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -14,6 +16,9 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -60,7 +65,7 @@ public class LoginFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        setHasOptionsMenu(false);
     }
 
     @Override
@@ -119,6 +124,8 @@ public class LoginFragment extends Fragment {
                             FragmentManager fm = getActivity().getSupportFragmentManager();
                             FragmentTransaction transaction = fm.beginTransaction();
                             transaction.replace(R.id.fragment_container, mapFrag, "MAP_FRAG");
+                            setHasOptionsMenu(true);
+
                             transaction.commit();
                         }
                     }
@@ -136,7 +143,7 @@ public class LoginFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 int buttonIndex = gender.getCheckedRadioButtonId();
-                Button checkedButton = (RadioButton) gender.getChildAt(buttonIndex-1);
+                Button checkedButton = (RadioButton) gender.getChildAt((buttonIndex % 2));
 
                 RegisterRequest req = new RegisterRequest(userName.getText().toString(),
                         password.getText().toString(),
@@ -160,6 +167,7 @@ public class LoginFragment extends Fragment {
                             //Maybe getSupportFragmentManager()?
                             FragmentManager fm = getActivity().getSupportFragmentManager();
                             FragmentTransaction transaction = fm.beginTransaction();
+                            setHasOptionsMenu(true);
                             transaction.replace(R.id.fragment_container, mapFrag, "MAP_FRAG");
                             transaction.commit();
                         }
@@ -189,7 +197,6 @@ public class LoginFragment extends Fragment {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-//                TODO: Maybe change a login/register object.
 
             }
 
@@ -286,7 +293,6 @@ public class LoginFragment extends Fragment {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-//                TODO: Maybe change a login/register object.
 
             }
 
@@ -315,7 +321,6 @@ public class LoginFragment extends Fragment {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-//                TODO: Maybe change a login/register object.
 
             }
 
@@ -344,7 +349,6 @@ public class LoginFragment extends Fragment {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-//                TODO: Maybe change a login/register object.
 
             }
 
@@ -380,5 +384,27 @@ public class LoginFragment extends Fragment {
             }
         });
 
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        inflater.inflate(R.menu.main_menu, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_search: {
+                Intent intent = new Intent(getActivity(), SearchActivity.class);
+                startActivity(intent);
+                return true;
+            }
+            case R.id.action_settings: {
+                Intent intent = new Intent(getActivity(), SettingsActivity.class);
+                startActivity(intent);
+                return true;
+            }
+        }
+        return true;
     }
 }

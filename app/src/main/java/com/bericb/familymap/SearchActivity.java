@@ -9,9 +9,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.Filter;
 import android.widget.TextView;
 
 
@@ -39,7 +41,7 @@ public class SearchActivity extends AppCompatActivity {
 
         searchField = findViewById(R.id.search_field);
 
-        search("");
+        FilterHelper.search("");
         recyclerView = findViewById(R.id.search_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(SearchActivity.this));
         adapter = new SearchAdapter( matchedEvents, matchedPeople);
@@ -58,64 +60,29 @@ public class SearchActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-//          TODO: implement search functionality.
 
 
             }
 
             @Override
             public void afterTextChanged(Editable s) {
-                search(s);
-                adapter.updateData(matchedEvents, matchedPeople);
+                SearchRez results = FilterHelper.search(s);
+
+                adapter.updateData(results.getMatchedEvents(), results.getMatchedPeople());
                 adapter.notifyDataSetChanged();
             }
 
         });
     }
 
-
-    private void search(CharSequence s) {
-
-        if (s == "") {
-            return;
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            Intent intent = new Intent(this, MainActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
         }
-        s = s.toString().toLowerCase();
-        int sNum;
-        try {
-            sNum = Integer.parseInt(s.toString());
-
-        } catch (Exception e){
-            sNum = 999999;
-        }
-
-        Map<String, Event> events = DataCache.getInstance().getEvents();
-        Map<String, Person> people = DataCache.getInstance().getPeople();
-
-        matchedEvents = new ArrayList<Event>();
-        matchedPeople = new ArrayList<Person>();
-
-        for (Object entry :
-                events.values()) {
-            Event event = (Event) entry;
-            if (event.getCity().toLowerCase().contains(s) || event.getCountry().toLowerCase().contains(s) || event.getEventType().contains(s) || event.getYear() == sNum) {
-                matchedEvents.add(event);
-            }
-        }
-
-        for(Object entry:
-                people.values()) {
-            Person person = (Person) entry;
-
-            if (person.getFirstName().toLowerCase().contains(s) || person.getLastName().toLowerCase().contains(s)) {
-                matchedPeople.add(person);
-            }
-        }
-        System.out.println(matchedEvents);
-
-        System.out.println(matchedPeople);
-
-
-
+        return true;
     }
 
     private class SearchAdapter extends RecyclerView.Adapter<SearchViewHolder> {
@@ -183,11 +150,9 @@ public class SearchActivity extends AppCompatActivity {
             itemView.setOnClickListener(this);
 
             if (viewType == PERSON_ITEM) {
-                //TODO: GET and SET event item fields and such.
                 name = itemView.findViewById(R.id.personName);
                 eventInfo = null;
             } else {
-                //TODO: GET and SET person item fields and such.
                 name = itemView.findViewById(R.id.personName);
                 eventInfo = itemView.findViewById(R.id.event_info);
             }
@@ -196,7 +161,6 @@ public class SearchActivity extends AppCompatActivity {
 
         @Override
         public void onClick(View v) {
-            //TODO: Open up new activities
             if (viewType == PERSON_ITEM) {
                 Intent intent = new Intent(SearchActivity.this, PersonActivity.class);
                 intent.putExtra("PERSON", person.getPersonID());
@@ -231,12 +195,9 @@ public class SearchActivity extends AppCompatActivity {
                     break;
             }
 
-
             String fullName = person.getFirstName() + " " + person.getLastName();
             name.setText(fullName);
 
-
         }
-
     }
 }

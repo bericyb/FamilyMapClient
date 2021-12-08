@@ -4,7 +4,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.MenuItem;
 
 import model.Event;
 
@@ -21,15 +23,25 @@ public class EventActivity extends AppCompatActivity {
 
         Bundle extras = getIntent().getExtras();
 
-        String eventID = extras.getString(String.valueOf(R.string.eventIntent));
+        String eventID = extras.getString("EVENT");
         Event currEvent = DataCache.getInstance().getEventByID(eventID);
 
-        EventMapsFragment mapFrag = new EventMapsFragment();
+        MapFragment mapFrag = new MapFragment();
         Bundle bundle = new Bundle();
         bundle.putString("EVENT", eventID);
         mapFrag.setArguments(bundle);
 
 
         fragmentManager.beginTransaction().add(R.id.fragment_container, mapFrag).commit();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            Intent intent = new Intent(this, MainActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+        }
+        return true;
     }
 }

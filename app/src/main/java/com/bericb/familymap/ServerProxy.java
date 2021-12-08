@@ -76,8 +76,6 @@ public class ServerProxy {
         }
     }
 
-
-
     RegisterResult register(RegisterRequest request, String serverHost, String serverPort) {
         try {
             URL url = new URL("http://" + serverHost + ":" + serverPort + "/user/register");
@@ -127,6 +125,7 @@ public class ServerProxy {
             return new RegisterResult("Failed to register because username is taken.", false);
         }
     }
+
     AllPersonResult getPeople(AllPersonRequest request, String authToken) {
         try {
             URL url = new URL("http://" + serverHost + ":" + serverPort + "/person");

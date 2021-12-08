@@ -46,9 +46,7 @@ public class DataGrabTask implements Runnable {
             eventMap.put(event.getEventID(), event);
         }
         DataCache.getInstance().setEvents(eventMap);
-
-        //TODO: Grab and set person events
-
+        DataCache.getInstance().setCopyEvents(eventMap);
 
         //Get user and return user's name in welcome string.
         Person userPerson = DataCache.getInstance().getPersonByID(loginRes.getPersonID());
